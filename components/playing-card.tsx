@@ -51,9 +51,8 @@ export function PlayingCard({
                 <span
                   className="power-token"
                   data-power-id={powerId}
-                  // TODO: il faut rendre l'id unique! Présentement, si on a plusieurs cartes avec le même pouvoir, l'id sera dupliqué.
-                  id={`${powerId}`}
-                  key={powerId}
+                  id={`${id}_${powerId}`}
+                  key={`${id}_${powerId}`}
                   title={`${powerId}`}
                   aria-label={`${powerId}`}
                 >

@@ -8,7 +8,7 @@ import {
   Plus,
   Zap,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PlayingCard, type PowerId } from "@/components/playing-card";
 import "@/components/animations.css";
 
@@ -46,6 +46,14 @@ export function AnimationsCSS() {
   const drawCards = powerCards;
   // On affiche la plus récente à gauche : c'est elle qui prend la place de la carte visible.
   const visibleDrawCards = drawCards.slice(0, drawnCount + 1).reverse();
+  const selectedCard = powerCards.find((card) => card.id === selectedCardId) ?? powerCards[0];
+  const availablePowerIds = selectedCard.powerIds;
+
+  useEffect(() => {
+    if (!availablePowerIds.includes(selectedPowerId)) {
+      setSelectedPowerId(availablePowerIds[0]);
+    }
+  }, [availablePowerIds, selectedPowerId]);
 
   const firstCardId = "card1";
 
@@ -101,23 +109,16 @@ await new Promise(resolve => setTimeout(resolve, 500));
   function activatePower() {
     // TODO: Il faut obtenir l'élément du DOM correspondant à la carte et au pouvoir sélectionnés
     // puis lui appliquer la classe "power-active" pour déclencher l'animation.
-
-    const element = document.getElementById(`${selectedCardId}_${selectedPowerId}`); 
-    // const element2 = document.getElementById(selectedPowerId); 
-
-    // if(!element){
-    //   return; 
-    // }
-if(element){  element.classList.remove("power-active"); 
-     
-
-      void element.offsetWidth; 
-      element?.classList.add("power-active"); 
+    const powerElementId = `${selectedCardId}_${selectedPowerId}`;
+    const element = document.getElementById(powerElementId);
+    if (!element) {
+      return;
     }
-  
-    
-   
-    
+
+    // Retire puis réapplique la classe pour relancer l'animation même si on clique plusieurs fois.
+    element.classList.remove("power-active");
+    void element.offsetWidth;
+    element.classList.add("power-active");
 
   }
 
@@ -219,7 +220,7 @@ if(element){  element.classList.remove("power-active");
                 <label>
                   <span className="control-label">POUVOIR</span>
                   <select value={selectedPowerId} onChange={(event) => { setSelectedPowerId(event.target.value as PowerId); }}>
-                    {powerIds.map((power) => (
+                    {availablePowerIds.map((power) => (
                       <option key={power} value={power}>{power}</option>
                     ))}
                   </select>
@@ -264,7 +265,9 @@ if(element){  element.classList.remove("power-active");
                     id="simple_c42"
                     powerIds={powerCards[0].powerIds}
                     // TODO: Ajouter la classe d'animation pour que la carte se retourne
+                    className="flip-scale-up-ver"
                   />
+                 
                 )}
               </div>
               {!simpleDrawn && (
@@ -313,6 +316,7 @@ if(element){  element.classList.remove("power-active");
                           id={`draw_${card.id}`}
                           powerIds={card.powerIds}
                           // TODO: Ajouter la classe d'animation pour que la carte se retourne
+                        className="flip-scale-up-ver"
                         />
                       );
                     }
@@ -327,6 +331,7 @@ if(element){  element.classList.remove("power-active");
                           id={`draw_${card.id}`}
                           powerIds={card.powerIds}
                           // TODO: Ajouter la classe d'animation pour que la carte se retourne déplace vers la droite
+                          className="slide-right"
                         />
                       );
                     }
